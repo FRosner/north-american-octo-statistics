@@ -1,21 +1,15 @@
 package de.famrosner.githubstatistics
 
 import com.google.gson.reflect.TypeToken
-import com.google.gson.{JsonObject, JsonArray, Gson}
+import com.google.gson.Gson
 
 import scalaj.http.Http
 import scalaj.http.HttpResponse
 
 import java.lang.reflect.Type
 
-import scalaz._
-import Scalaz._
-
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashMap
-
-import scala.util.parsing.json._
-
 
 object Launch {
 
