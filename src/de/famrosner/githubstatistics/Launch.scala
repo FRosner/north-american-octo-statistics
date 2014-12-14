@@ -35,13 +35,22 @@ object Launch {
   val languageUrl = "https://api.github.com/repos/%s/languages"
 
   def main(args: Array[String]): Unit = {
+
     def repo2language(response: HttpResponse[String]): java.util.Map[String, Double] = {
       gson.fromJson(response.body, languageMapType)
     }
-    def mergeMap[A, B](maps: Iterable[Map[A, B]])(f: (B, B) => B): Map[A, B] =
-      (Map[A, B]() /: (for (map <- maps; kv <- map) yield kv)) { (a, kv) =>
-        a + (if (a.contains(kv._1)) kv._1 -> f(a(kv._1), kv._2) else kv)
+
+    def mergeMap[A, B](maps: Iterable[Map[A, B]])(aggregate: (B, B) => B): Map[A, B] = {
+      val keyValuePairs = for (map <- maps; keyValuePair <- map) yield keyValuePair
+      keyValuePairs.foldLeft(Map[A, B]()) { (mergedMap, keyValuePair) =>
+        mergedMap + (
+          if (mergedMap.contains(keyValuePair._1))
+            keyValuePair._1 -> aggregate(mergedMap(keyValuePair._1), keyValuePair._2)
+          else
+            keyValuePair
+        )
       }
+    }
 
     val repositoriesResponse = Http(repositoriesUrl).asString
     val repositories: Array[Repository] = gson.fromJson(repositoriesResponse.body, classOf[Array[Repository]]).take(5)
